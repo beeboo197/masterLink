@@ -9,7 +9,7 @@ bot.on('message', async (ctx) => {
     const input = await ctx.msg.text.replace(/ /g, '')
     const code = await input.split("\n")
     const resultArray = [];
-    const browser = await puppeteer.launch({headless: false});
+    const browser = await puppeteer.launch({headless: true});
     const page = await browser.newPage()
     await page.setViewport({width: 1200, height: 720});
     await page.goto('https://pages.lazada.vn/wow/i/vn/ecommerce/aff-short-link', { waitUntil: 'domcontentloaded' }); // wait until page load
