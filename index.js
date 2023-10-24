@@ -1,7 +1,7 @@
-import express from "express";
-import { Bot,webhookCallback } from "grammy";
-import puppeteer from "puppeteer";
-import {} from 'dotenv/config'
+const express = require("express");
+const { Bot,webhookCallback } = require("grammy");
+const puppeteer = require("puppeteer");
+require('dotenv').config
 const bot = new Bot(process.env.BOT_TOKEN);
 
 bot.on('message', async (ctx) => {
