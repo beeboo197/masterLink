@@ -6,7 +6,7 @@ const bot = new Bot(process.env.BOT_TOKEN);
 
 bot.on('message', async (ctx) => {
     await ctx.reply("haha")
-}
+})
 // bot.on('message', async (ctx) => {
 //     const input = await ctx.msg.text.replace(/ /g, '')
 //     const code = await input.split("\n")
