@@ -12,9 +12,14 @@ bot.on('message', async (ctx) => {
   const laz = /lazada/gm
   const pee = /https:\/\/sh/;
   const aff = /c.lazada/gm
+  let retryCount = 0;
+  const maxRetries = 5;
+      while (retryCount < maxRetries) {
+      try { 
   if (linkRegex.test(message)) {
     const url = message.match(linkRegex)[0]
     console.log(url)
+    
     if (url.includes(lzd)){ 
       console.log("short") 
     await fetch(url).then(res => res.text()).then(async(data) => {
@@ -30,13 +35,13 @@ bot.on('message', async (ctx) => {
   fetch(`https://s.slamee.top/yourls-api.php?signature=0b172c9ad7&format=simple&action=shorturl&url=${encodeURIComponent(shopLink)}`).then(res => res.text()).then(data => {ctx.reply(data, {parse_mode: "HTML"})})
 }
 });
-      
+break;      
 } else {
   console.log("long")
   if (laz.test(url)){
     const linkLaz = await `https://c.lazada.vn/t/c.06wSoi?url=${encodeURIComponent(url)}&sub_aff_id=shorTool`
     fetch(`https://s.slamee.top/yourls-api.php?signature=0b172c9ad7&format=simple&action=shorturl&url=${encodeURIComponent(linkLaz)}`).then(res => res.text()).then(data => {ctx.reply(data, {parse_mode: "HTML"})})
-
+break;
   }
 }
    
@@ -45,8 +50,12 @@ bot.on('message', async (ctx) => {
   const voucherCode = await `https://c.lazada.vn/t/c.06wSoi?url=${encodeURIComponent(`https://www.lazada.vn/catalog/?q=${message}`)}&sub_aff_id=shorTool`
   console.log(voucherCode)
   fetch(`https://s.slamee.top/yourls-api.php?signature=0b172c9ad7&format=simple&action=shorturl&url=${encodeURIComponent(voucherCode)}`).then(res => res.text()).then(data => {ctx.reply(data, {parse_mode: "HTML"})})
-
+break;
 } 
+} catch {
+  console.log(err)
+      retryCount++;
+}}
 })
 
 if (process.env.NODE_ENV === "production") {
