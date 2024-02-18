@@ -1,6 +1,6 @@
 import express from "express";
 import { Bot,webhookCallback } from "grammy";
-import puppeteer from "puppeteer";
+import fetch from "node-fetch";
 import {} from 'dotenv/config'
 const bot = new Bot(process.env.BOT_TOKEN);
 
