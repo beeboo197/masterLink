@@ -1,37 +1,52 @@
-const express = require("express");
-const { Bot,webhookCallback } = require("grammy");
-const puppeteer = require("puppeteer");
-require('dotenv').config
+import express from "express";
+import { Bot,webhookCallback } from "grammy";
+import puppeteer from "puppeteer";
+import {} from 'dotenv/config'
 const bot = new Bot(process.env.BOT_TOKEN);
 
-// bot.on('message', async (ctx) => {
-//     await ctx.reply("haha")
-// })
+
 bot.on('message', async (ctx) => {
-    const input = await ctx.msg.text.replace(/ /g, '')
-    const code = await input.split("\n")
-    const resultArray = [];
-    const browser = await puppeteer.launch({headless: "new"});
-    const page = await browser.newPage()
-    await page.setViewport({width: 1200, height: 720});
-    await page.goto('https://pages.lazada.vn/wow/i/vn/ecommerce/aff-short-link', { waitUntil: 'domcontentloaded' }); // wait until page load
-    await page.type('#q', "https://www.lazada.vn/catalog/?q=");  
-    await page.type('#masterLink', 'https://c.lazada.vn/t/c.06wSoi');
-    for (const codes in code) {
-    await page.waitForXPath(`//*[@id="sourceUrl"]`)
-    await page.$eval('#sourceUrl', textbox => textbox.value = '');
-    await page.type('#sourceUrl', `https://www.lazada.vn/catalog/?q=${code[codes]}`)
-    await page.click('#submitButton')
-    await page.waitForSelector('a#affShortLink');
-    await page.type('#q', "https://www.lazada.vn/catalog/?q=");
-    await page.waitForXPath("/html/body/div[2]/div/div/div/form/div[12]/div[1]/a")
-    await page.waitForXPath("/html/body/div[2]/div/div/div/form/div[12]/div[1]/a")
-    const value = await page.$eval('a#affShortLink', el => el.textContent + "?kol")
-    await resultArray.push(value); 
-    }
-    await ctx.reply(resultArray.toString().replace(/,/g,"\n"))
-    await browser.close() 
-     
+  const message = ctx.message.text;
+  const linkRegex = /(https?:\/\/[^\s]+)/;
+  const lzd = 'https://s.lazada'
+  const laz = /lazada/gm
+  const pee = /https:\/\/sh/;
+  const aff = /c.lazada/gm
+  if (linkRegex.test(message)) {
+    const url = message.match(linkRegex)[0]
+    console.log(url)
+    if (url.includes(lzd)){ 
+      console.log("short") 
+    await fetch(url).then(res => res.text()).then(async(data) => {
+      const longUrl = await decodeURIComponent(data.match(/URL\('(.*?)dsource/g)
+      .toString()
+      .replace(/URL\('/g, '')
+      .replace(/%3Fdsource/,''))
+      if (aff.test(longUrl)) {  
+        const productLink = await `https://c.lazada.vn/t/c.06wSoi?url=${encodeURIComponent(longUrl.match(/share&url=(.*?)\html/)[1] + 'html')}&sub_aff_id=shorTool`
+  fetch(`https://s.slamee.top/yourls-api.php?signature=0b172c9ad7&format=simple&action=shorturl&url=${encodeURIComponent(productLink)}`).then(res => res.text()).then(data => {ctx.reply(data, {parse_mode: "HTML"})})
+}  else {
+  const shopLink = await `https://c.lazada.vn/t/c.06wSoi?url=${encodeURIComponent(longUrl.split("?")[0]+'?path=index.htm')}&sub_aff_id=shorTool`
+  fetch(`https://s.slamee.top/yourls-api.php?signature=0b172c9ad7&format=simple&action=shorturl&url=${encodeURIComponent(shopLink)}`).then(res => res.text()).then(data => {ctx.reply(data, {parse_mode: "HTML"})})
+}
+});
+      
+} else {
+  console.log("long")
+  if (laz.test(url)){
+    const linkLaz = await `https://c.lazada.vn/t/c.06wSoi?url=${encodeURIComponent(url)}&sub_aff_id=shorTool`
+    fetch(`https://s.slamee.top/yourls-api.php?signature=0b172c9ad7&format=simple&action=shorturl&url=${encodeURIComponent(linkLaz)}`).then(res => res.text()).then(data => {ctx.reply(data, {parse_mode: "HTML"})})
+
+  }
+}
+   
+} else {
+  console.log(message)
+  const voucherCode = await `https://c.lazada.vn/t/c.06wSoi?url=${encodeURIComponent(`https://www.lazada.vn/catalog/?q=${message}`)}&sub_aff_id=shorTool`
+  console.log(voucherCode)
+  fetch(`https://s.slamee.top/yourls-api.php?signature=0b172c9ad7&format=simple&action=shorturl&url=${encodeURIComponent(voucherCode)}`).then(res => res.text()).then(data => {ctx.reply(data, {parse_mode: "HTML"})})
+
+} 
 })
 
 if (process.env.NODE_ENV === "production") {
